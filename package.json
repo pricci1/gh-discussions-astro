@@ -1,6 +1,9 @@
 {
   "name": "discussions-playground",
   "module": "index.ts",
+  "scripts": {
+    "check": "bunx --bun biome check"
+  },
   "workspaces": ["apps/*", "packages/*"],
   "devDependencies": {
     "@biomejs/biome": "2.0.0-beta.4",
