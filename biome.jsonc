@@ -41,6 +41,12 @@
       "linter": {
         "enabled": false
       }
+    },
+    {
+      "includes": ["apps/astro-blog-demo/**/*.astro"],
+      "linter": {
+        "enabled": false
+      }
     }
   ]
 }
