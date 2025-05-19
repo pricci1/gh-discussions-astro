@@ -1,5 +1,5 @@
-import { z } from "astro:content";
 import type { Loader } from "astro/loaders";
+import { z } from "astro/zod";
 
 import { Octokit } from "octokit";
 
