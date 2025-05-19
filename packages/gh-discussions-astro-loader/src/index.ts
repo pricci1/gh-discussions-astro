@@ -13,6 +13,11 @@ const discussionAuthorSchema = z.object({
   url: z.string().url(),
 });
 
+const discussionLabelSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+});
+
 const discussionSchema = z.object({
   id: z.string(),
   number: z.number().int(),
@@ -21,7 +26,15 @@ const discussionSchema = z.object({
   url: z.string().url(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
-  author: discussionAuthorSchema
+  author: discussionAuthorSchema,
+  labels: z.union([
+    z
+      .object({
+        nodes: z.array(discussionLabelSchema),
+      })
+      .transform((data) => data.nodes),
+    z.array(discussionLabelSchema),
+  ]),
 });
 
 export function ghDiscussionsLoader(options: LoaderOptions): Loader {
@@ -47,6 +60,12 @@ export function ghDiscussionsLoader(options: LoaderOptions): Loader {
                   title
                   body
                   url
+                  labels(first: 100) {
+                    nodes {
+                      id
+                      name
+                    }
+                  }
                   createdAt
                   updatedAt
                   author {
