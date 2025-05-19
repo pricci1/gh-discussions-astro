@@ -27,14 +27,14 @@ const discussionSchema = z.object({
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
   author: discussionAuthorSchema,
-  labels: z.union([
-    z
-      .object({
+  labels: z
+    .union([
+      z.object({
         nodes: z.array(discussionLabelSchema),
-      })
-      .transform((data) => data.nodes),
-    z.array(discussionLabelSchema),
-  ]),
+      }),
+      z.array(discussionLabelSchema),
+    ])
+    .transform((data) => (Array.isArray(data) ? data : data.nodes)),
 });
 
 export function ghDiscussionsLoader(options: LoaderOptions): Loader {
