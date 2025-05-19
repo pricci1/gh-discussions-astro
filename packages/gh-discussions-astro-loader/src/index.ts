@@ -1,11 +1,16 @@
-import type { Loader } from "astro/loaders";
+import type { Loader, LoaderContext } from "astro/loaders";
 import { z } from "astro/zod";
 
 import { Octokit } from "octokit";
 
+type RenderedContent = NonNullable<
+  ReturnType<LoaderContext["store"]["entries"]>[number][1]["rendered"]
+>;
+
 type LoaderOptions = {
   repoUrl: string;
   apiKey: string;
+  renderer?: (body: string) => RenderedContent | Promise<RenderedContent>;
 };
 
 const discussionAuthorSchema = z.object({
@@ -84,9 +89,13 @@ export function ghDiscussionsLoader(options: LoaderOptions): Loader {
         );
 
         repository.discussions.nodes.forEach(async (rawDiscussion) => {
-          const discussion = z.object({ id: z.string() }).passthrough().parse(rawDiscussion);
+          const discussion = z
+            .object({ id: z.string(), body: z.string() })
+            .passthrough()
+            .parse(rawDiscussion);
+          const renderedBody = await options.renderer?.(discussion.body);
           const data = await context.parseData({ id: discussion.id, data: discussion });
-          context.store.set({ id: data.id, data });
+          context.store.set({ id: data.id, data, rendered: renderedBody });
         });
       } catch (error) {
         console.error("Error fetching GitHub discussions:", error);
