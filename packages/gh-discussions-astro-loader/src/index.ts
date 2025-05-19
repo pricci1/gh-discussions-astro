@@ -48,7 +48,7 @@ export function ghDiscussionsLoader(options: LoaderOptions): Loader {
 
       try {
         const { repository } = await octokit.graphql<{
-          repository: { discussions: { nodes: unknown[] } };
+          repository: { discussions: { nodes: Record<string, unknown>[] } };
         }>(
           `
           query getDiscussions($owner: String!, $repo: String!) {
@@ -83,9 +83,10 @@ export function ghDiscussionsLoader(options: LoaderOptions): Loader {
           },
         );
 
-        const discussions = repository.discussions.nodes.map(discussionSchema.parse);
-        discussions.forEach((discussion) => {
-          context.store.set({ id: discussion.id, data: discussion });
+        repository.discussions.nodes.forEach(async (rawDiscussion) => {
+          const discussion = z.object({ id: z.string() }).passthrough().parse(rawDiscussion);
+          const data = await context.parseData({ id: discussion.id, data: discussion });
+          context.store.set({ id: data.id, data });
         });
       } catch (error) {
         console.error("Error fetching GitHub discussions:", error);
