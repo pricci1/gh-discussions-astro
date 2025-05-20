@@ -23,6 +23,11 @@ const discussionLabelSchema = z.object({
   name: z.string(),
 });
 
+const discussionCategorySchema = z.object({
+  id: z.string(),
+  name: z.string(),
+});
+
 const discussionSchema = z.object({
   id: z.string(),
   number: z.number().int(),
@@ -40,6 +45,7 @@ const discussionSchema = z.object({
       z.array(discussionLabelSchema),
     ])
     .transform((data) => (Array.isArray(data) ? data : data.nodes)),
+  category: discussionCategorySchema,
 });
 
 export function ghDiscussionsLoader(options: LoaderOptions): Loader {
@@ -76,6 +82,10 @@ export function ghDiscussionsLoader(options: LoaderOptions): Loader {
                   author {
                     login
                     url
+                  }
+                  category {
+                    id
+                    name
                   }
                 }
               }
