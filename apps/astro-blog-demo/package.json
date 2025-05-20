@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@repo/gh-discussions-astro-loader": "workspace:*",
-    "astro": "^5.7.13"
+    "astro": "^5.7.13",
+    "remark-frontmatter": "^5.0.0"
   }
 }
