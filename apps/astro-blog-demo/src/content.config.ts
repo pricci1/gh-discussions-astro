@@ -12,6 +12,7 @@ const blog = defineCollection({
   loader: ghDiscussionsLoader({
     repoUrl: "https://github.com/pricci1/gh-discussions-astro",
     apiKey: import.meta.env.GH_API_KEY,
+    categoryIds: ["DIC_kwDOOrPQBs4CqOrX", "DIC_kwDOOrPQBs4CqOq-", "DIC_kwDOOrPQBs4CqOqs"],
     renderer: async (content) => {
       const processed = await processor.render(content);
       const { frontmatter } = parseFrontmatter(content);
