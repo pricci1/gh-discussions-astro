@@ -1,5 +1,5 @@
 ---
-import { getCollection } from "astro:content";
+import { getCollection, render } from "astro:content";
 
 const posts = await getCollection("blog");
 ---
@@ -17,7 +17,7 @@ const posts = await getCollection("blog");
 		<ul>
 			{posts.map((post) => (
 				<li>
-					{post.id} - {post.data.title}
+                    <a href={`/${post.id}`}>{post.data.title}</a>
 				</li>
 			))}
 		</ul>
