@@ -22,6 +22,7 @@ jobs:
         uses: withastro/action@v3
         with:
           path: apps/astro-blog-demo
+          package-manager: bun@latest
         env:
           GH_API_KEY: ${{ secrets.GITHUB_TOKEN }}
 
