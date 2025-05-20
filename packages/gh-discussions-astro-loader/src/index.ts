@@ -15,6 +15,17 @@ type LoaderOptions = {
   renderer?: (body: string) => RenderedContent | Promise<RenderedContent>;
 };
 
+const repoUrlSchema = z
+  .string()
+  .url()
+  .transform((url) => {
+    const urlParts = url.split("/");
+    return {
+      owner: z.string().min(1).parse(urlParts.at(-2)),
+      repo: z.string().min(1).parse(urlParts.at(-1)),
+    };
+  });
+
 const discussionAuthorSchema = z.object({
   login: z.string(),
   url: z.string().url(),
@@ -55,9 +66,7 @@ export function ghDiscussionsLoader(options: LoaderOptions): Loader {
     name: "gh-discussions-loader",
     load: async (context) => {
       const octokit = new Octokit({ auth: options.apiKey });
-      const urlParts = options.repoUrl.split("/");
-      const owner = urlParts[urlParts.length - 2];
-      const repo = urlParts[urlParts.length - 1];
+      const { owner, repo } = repoUrlSchema.parse(options.repoUrl);
       const categoryIds = options.categoryIds || [null];
 
       const { query, variables } = buildGetDiscussionsQuery({
