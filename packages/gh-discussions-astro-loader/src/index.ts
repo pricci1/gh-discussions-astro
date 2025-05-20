@@ -2,6 +2,7 @@ import type { Loader, LoaderContext } from "astro/loaders";
 import { z } from "astro/zod";
 
 import { Octokit } from "octokit";
+import { buildGetDiscussionsQuery } from "./getDiscussionsQueryBuilder";
 
 type RenderedContent = NonNullable<
   ReturnType<LoaderContext["store"]["entries"]>[number][1]["rendered"]
@@ -10,6 +11,7 @@ type RenderedContent = NonNullable<
 type LoaderOptions = {
   repoUrl: string;
   apiKey: string;
+  categoryIds?: string[];
   renderer?: (body: string) => RenderedContent | Promise<RenderedContent>;
 };
 
@@ -56,57 +58,30 @@ export function ghDiscussionsLoader(options: LoaderOptions): Loader {
       const urlParts = options.repoUrl.split("/");
       const owner = urlParts[urlParts.length - 2];
       const repo = urlParts[urlParts.length - 1];
+      const categoryIds = options.categoryIds || [null];
+
+      const { query, variables } = buildGetDiscussionsQuery({
+        owner,
+        repo,
+        categoryIds,
+      });
 
       try {
         const { repository } = await octokit.graphql<{
-          repository: { discussions: { nodes: Record<string, unknown>[] } };
-        }>(
-          `
-          query getDiscussions($owner: String!, $repo: String!) {
-            repository(owner: $owner, name: $repo) {
-              discussions(first: 100) {
-                nodes {
-                  id
-                  number
-                  title
-                  body
-                  url
-                  labels(first: 100) {
-                    nodes {
-                      id
-                      name
-                    }
-                  }
-                  createdAt
-                  updatedAt
-                  author {
-                    login
-                    url
-                  }
-                  category {
-                    id
-                    name
-                  }
-                }
-              }
-            }
-          }
-        `,
-          {
-            owner,
-            repo,
-          },
-        );
+          repository: Record<string, { nodes: Record<string, unknown>[] }>;
+        }>(query, variables);
 
-        repository.discussions.nodes.forEach(async (rawDiscussion) => {
-          const discussion = z
-            .object({ id: z.string(), body: z.string() })
-            .passthrough()
-            .parse(rawDiscussion);
-          const renderedBody = await options.renderer?.(discussion.body);
-          const data = await context.parseData({ id: discussion.id, data: discussion });
-          context.store.set({ id: data.id, data, rendered: renderedBody });
-        });
+        Object.values(repository)
+          .flatMap((cat) => cat.nodes)
+          .forEach(async (rawDiscussion) => {
+            const discussion = z
+              .object({ id: z.string(), body: z.string() })
+              .passthrough()
+              .parse(rawDiscussion);
+            const renderedBody = await options.renderer?.(discussion.body);
+            const data = await context.parseData({ id: discussion.id, data: discussion });
+            context.store.set({ id: data.id, data, rendered: renderedBody });
+          });
       } catch (error) {
         console.error("Error fetching GitHub discussions:", error);
         context.store.set({ id: "error", data: { error: "Failed to fetch discussions" } });
