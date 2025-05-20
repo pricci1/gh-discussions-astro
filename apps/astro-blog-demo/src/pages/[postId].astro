@@ -23,6 +23,10 @@ const { Content } = await render(post);
 
 <Content />
 
+<a href={`${post.data.url}#discussion-comment-count`}>Go to comments</a>
+<br>
+<br>
+
 <details>
     <summary>Object</summary>
     <pre>{JSON.stringify(post, null, 2)}</pre>
