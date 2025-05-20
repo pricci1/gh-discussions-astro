@@ -14,7 +14,7 @@ export const getStaticPaths = (async () => {
 const { post } = Astro.props;
 const { Content } = await render(post);
 ---
-<a href="/">Home</a>
+<a href="/gh-discussions-astro/">Home</a>
 {
   Array.isArray(post.data.labels) && post.data.labels.length > 0 && (
     <p>Labels:{post.data.labels.map((l) => ` ${l.name}`)}</p>
