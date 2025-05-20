@@ -1,4 +1,4 @@
-# discussions-playground
+# gh-discussions-astro
 
 To install dependencies:
 

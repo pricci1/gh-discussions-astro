@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "discussions-playground",
+      "name": "gh-discussions-astro",
       "dependencies": {
         "octokit": "^4.1.3",
       },

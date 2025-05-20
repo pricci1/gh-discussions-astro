@@ -10,7 +10,7 @@ const processor = await createMarkdownProcessor({
 
 const blog = defineCollection({
   loader: ghDiscussionsLoader({
-    repoUrl: "https://github.com/pricci1/discussions-playground",
+    repoUrl: "https://github.com/pricci1/gh-discussions-astro",
     apiKey: import.meta.env.GH_API_KEY,
     renderer: async (content) => {
       const processed = await processor.render(content);

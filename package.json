@@ -1,5 +1,5 @@
 {
-  "name": "discussions-playground",
+  "name": "gh-discussions-astro",
   "module": "index.ts",
   "scripts": {
     "check": "bunx --bun biome check"
